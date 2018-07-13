@@ -1,26 +1,47 @@
 const graphql = require('graphql');
-const _ = require('lodash');
+const axios = require('axios');
 
 const {
   GraphQLObjectType,
   GraphQLString,
   GraphQLInt,
-  GraphQLSchema
+  GraphQLSchema,
+  GraphQLList
 } = graphql;
+
+const RuleType = new GraphQLObjectType({
+  name: 'Rule',
+  fields: () =>({
+    id: { type: GraphQLString },
+    name: { type : GraphQLString },
+    description: { type:  GraphQLString },
+    users: {
+      type: new GraphQLList(UserType),
+      resolve(parentValue, arg){
+        return axios.get(`http://localhost:3000/rules/${parentValue.id}/users`)
+          .then(resp => resp.data);
+      }
+    }
+  })
+});
+
 
 const UserType = new GraphQLObjectType({
   name: 'User',
-  fields: {
+  fields: () =>({
     id: { type: GraphQLString },
     firstName: {type : GraphQLString},
-    age: { type:  GraphQLInt }
-  }
+    age: { type:  GraphQLInt },
+    rule: {
+      type: RuleType,
+      resolve(parentValue, args) {
+        return axios.get(`http://localhost:3000/rules/${parentValue.ruleId}`)
+          .then(resp => resp.data);
+      }
+    }
+  })
 });
 
-const users = [
-  {id: '23', firstName: 'Hector',  age: 20 },
-  {id: '24', firstName: 'Samuel',  age: 26 },
-];
 
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
@@ -29,7 +50,16 @@ const RootQuery = new GraphQLObjectType({
       type: UserType,
       args: { id: { type: GraphQLString } },
       resolve(parentValue, args){
-        return _.find(users, { id: args.id });
+        return axios.get(`http://localhost:3000/users/${args.id}`)
+          .then(resp => resp.data);
+      }
+    },
+    rule: {
+      type: RuleType,
+      args: {id: { type: GraphQLString } },
+      resolve(parentValue, args){
+        return axios.get(`http://localhost:3000/rules/${args.id}`)
+          .then(resp => resp.data);
       }
     }
   }

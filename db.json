@@ -1,0 +1,10 @@
+{
+  "users": [
+    { "id": "23", "firstName": "Hector",  "age": 20, "ruleId": "1"},
+    { "id": "24", "firstName": "Samuel",  "age": 26, "ruleId": "2"}
+  ],
+  "rules": [
+    { "id": "1", "name": "viewData", "description": "view all data of user" },
+    { "id": "2", "name": "hiddenData", "description": "hidden all data of user"}
+  ],
+}
