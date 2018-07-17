@@ -25,7 +25,7 @@ query user-rule
     age
     rule {
       id
-      firstName
+      name
       description
     }
   }
@@ -47,5 +47,36 @@ query rule-user-rule (referencia circular)
       }
     }
   }
+}
+```
+
+Fragments query 
+
+```
+{
+  findRule: rule(id: "1") {
+    users {
+      id
+      firstName
+      rule {
+        ...ruleDetails
+      }
+    }
+  }
+  findUser: user(id: "23") {
+    age
+    rule {
+      ...ruleDetails
+    }
+  }
+  fragmentRule: rule(id: "1") {
+    ...ruleDetails
+  }
+}
+
+fragment ruleDetails on Rule {
+  id
+  name
+  description
 }
 ```

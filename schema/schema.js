@@ -18,8 +18,12 @@ const RuleType = new GraphQLObjectType({
     users: {
       type: new GraphQLList(UserType),
       resolve(parentValue, arg){
-        return axios.get(`http://localhost:3000/rules/${parentValue.id}/users`)
-          .then(resp => resp.data);
+        return axios({
+          method: 'get',
+          url: `http://localhost:3000/rules/${parentValue.id}/users`,
+          timeout: 5000
+          })
+          .then(resp => resp.data)
       }
     }
   })
@@ -35,7 +39,11 @@ const UserType = new GraphQLObjectType({
     rule: {
       type: RuleType,
       resolve(parentValue, args) {
-        return axios.get(`http://localhost:3000/rules/${parentValue.ruleId}`)
+        return axios({
+          method: 'get',
+          url:`http://localhost:3000/rules/${parentValue.ruleId}`,
+          timeout: 1000
+         })
           .then(resp => resp.data);
       }
     }
@@ -58,7 +66,11 @@ const RootQuery = new GraphQLObjectType({
       type: RuleType,
       args: {id: { type: GraphQLString } },
       resolve(parentValue, args){
-        return axios.get(`http://localhost:3000/rules/${args.id}`)
+        return axios({
+           method: 'get',
+           url: `http://localhost:3000/rules/${args.id}`,
+           timeout: 4000,
+          })
           .then(resp => resp.data);
       }
     }

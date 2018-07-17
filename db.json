@@ -6,5 +6,21 @@
   "rules": [
     { "id": "1", "name": "viewData", "description": "view all data of user" },
     { "id": "2", "name": "hiddenData", "description": "hidden all data of user"}
+  ], 
+  "api-geo": [
+    { "id": "6", "name": "geoData", "description": "data geo Santiago" },
+    { "id": "4", "name": "geoData", "description": "data geo Valparaiso" }
   ],
+  "api-seller": [
+    { "id": "11", "name": "sellerData", "description": "data Seller Local" },
+    { "id": "12", "name": "sellerData", "description": "data Seller Inter" }
+  ],
+  "api-vendor": [
+    { "id": "18", "name": "vendorData", "description": "data Vendor Local" },
+    { "id": "19", "name": "vendorData", "description": "data Vendor Inter" }
+  ],
+  "api-cognito": [
+    { "id": "23", "name": "cognitoData", "description": "data user cognito" },
+    { "id": "24", "name": "cognitoData", "description": "data user cognito" }    
+  ]
 }
