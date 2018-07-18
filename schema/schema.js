@@ -1,5 +1,6 @@
 const graphql = require('graphql');
 const axios = require('axios');
+const _= require('lodash');
 
 const {
   GraphQLObjectType,
@@ -17,11 +18,10 @@ const RuleType = new GraphQLObjectType({
     description: { type:  GraphQLString },
     users: {
       type: new GraphQLList(UserType),
-      resolve(parentValue, arg){
+      resolve : async (parentValue, arg) => {
         return axios({
           method: 'get',
-          url: `http://localhost:3000/rules/${parentValue.id}/users`,
-          timeout: 5000
+          url: `http://localhost:3000/rules/${parentValue.id}/users`
           })
           .then(resp => resp.data)
       }
@@ -38,18 +38,34 @@ const UserType = new GraphQLObjectType({
     age: { type:  GraphQLInt },
     rule: {
       type: RuleType,
-      resolve(parentValue, args) {
-        return axios({
-          method: 'get',
-          url:`http://localhost:3000/rules/${parentValue.ruleId}`,
-          timeout: 1000
-         })
-          .then(resp => resp.data);
+      resolve: async (parentValue, args) => {
+        return await resolveRuleAfter2Seconds(parentValue.ruleId); 
+      }
+    },
+    repo: {
+      type: RepoType,
+      resolve(parentValue, arg){
+        return axios.get(`https://api.github.com/users/eselopio/repos`)
+        .then((resp) => {
+          return _.find(resp.data, { 'id': parentValue.repoId });
+        });
       }
     }
+
   })
 });
 
+const RepoType = new GraphQLObjectType({
+  name: "Repo",
+  fields: ()=>({
+    id: { type: GraphQLInt }, 
+    node_id: { type : GraphQLString },
+    name: { type: GraphQLString },
+    full_name: { type: GraphQLString }, 
+    git_url: { type: GraphQLString },
+    language: { type: GraphQLString }
+  })
+});
 
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
@@ -59,24 +75,41 @@ const RootQuery = new GraphQLObjectType({
       args: { id: { type: GraphQLString } },
       resolve(parentValue, args){
         return axios.get(`http://localhost:3000/users/${args.id}`)
-          .then(resp => resp.data);
+          .then(resp =>  resp.data);
       }
     },
     rule: {
       type: RuleType,
-      args: {id: { type: GraphQLString } },
+      args: { id: { type: GraphQLString } },
+      resolve: async(parentValue, args) =>{
+        return await resolveRuleAfter2Seconds(args.id); 
+      }
+    },
+    repo: {
+      type: RepoType,
+      args: { id: {type: GraphQLInt } },
       resolve(parentValue, args){
-        return axios({
-           method: 'get',
-           url: `http://localhost:3000/rules/${args.id}`,
-           timeout: 4000,
-          })
-          .then(resp => resp.data);
+        return axios.get(`https://api.github.com/users/eselopio/repos`)
+          .then((resp) => {
+            return _.find(resp.data, { 'id': args.id });
+          });
       }
     }
   }
 })
 
+const resolveRuleAfter2Seconds= (args)=>{
+  return new Promise(resolve => {
+    setTimeout(() => {
+      axios({
+        method: 'get',
+        url: `http://localhost:3000/rules/${args}`
+        }).then((resp)=>{
+          resolve(resp.data);
+        })
+    }, 2000);
+  });
+}
 
 module.exports =  new GraphQLSchema({
   query: RootQuery

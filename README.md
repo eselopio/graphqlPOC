@@ -18,6 +18,8 @@ npm run dev
 http://localhost:4000/graphql
 ```
 
+## graphiql
+
 query user-rule
 ```
 {
@@ -78,5 +80,27 @@ fragment ruleDetails on Rule {
   id
   name
   description
+}
+```
+
+User + Rule + Repo
+
+```
+{
+  user(id:"23"){
+    firstName
+    age
+    rule{
+      name
+      description
+    }
+    repo {
+      id
+      name
+      full_name
+      git_url
+      language
+    }
+  }
 }
 ```
